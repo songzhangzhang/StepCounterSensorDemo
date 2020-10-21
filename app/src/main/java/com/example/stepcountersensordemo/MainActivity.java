@@ -10,15 +10,25 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.PowerManager;
 import android.util.Log;
+import android.widget.TextView;
+
+import com.example.stepcountersensordemo.databinding.ActivityMainBinding;
+
+import java.util.Calendar;
+import java.util.Date;
 
 public class MainActivity extends AppCompatActivity implements SensorEventListener {
     public static final String TAG = "MainActivity";
     private PowerManager.WakeLock wakeLock;
+    private com.example.stepcountersensordemo.databinding.ActivityMainBinding binding;
+    private boolean firstStepData = true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        binding = ActivityMainBinding.bind(findViewById(R.id.root_view));
+        binding.startTimeText.setText(new Date().toString());
         initStepCounterSensor();
     }
 
@@ -56,7 +66,16 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
 
     @Override
     public void onSensorChanged(SensorEvent sensorEvent) {
-        Log.d(TAG, new StepCounterSensorEvent(sensorEvent).toString());
+        StepCounterSensorEvent counterSensorEvent = new StepCounterSensorEvent(sensorEvent);
+        TextView textView;
+        if (firstStepData) {
+            firstStepData = false;
+            textView = binding.initialStepText;
+        } else {
+            textView = binding.currentStepText;
+        }
+        textView.setText("steps:" + counterSensorEvent.steps + ", time:" + new Date(counterSensorEvent.timestampInMillis).toString());
+        Log.d(TAG, counterSensorEvent.toString());
     }
 
     @Override

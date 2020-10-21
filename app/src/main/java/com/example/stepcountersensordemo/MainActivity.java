@@ -49,7 +49,9 @@ public class MainActivity extends AppCompatActivity implements SensorEventListen
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        wakeLock.release();
+        if (wakeLock != null) {
+            wakeLock.release();
+        }
     }
 
     @Override
